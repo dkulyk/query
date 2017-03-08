@@ -1,0 +1,25 @@
+{
+  "name": "dkulyk/query",
+  "description": "Laravel eloquent query generator",
+  "keywords": [
+    "laravel",
+    "query",
+    "eloquent"
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "laravel/framework": "^5.0"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Kulyk Dmytro",
+      "email": "lnkvisitor.ts@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "DKulyk\\Eloquent\\Query\\": "src/"
+    }
+  }
+}
