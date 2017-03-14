@@ -1,6 +1,6 @@
 {
   "name": "dkulyk/query",
-  "description": "Laravel eloquent query generator",
+  "description": "Laravel eloquent query constructor",
   "keywords": [
     "laravel",
     "query",
