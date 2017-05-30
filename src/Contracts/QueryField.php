@@ -22,11 +22,11 @@ interface QueryField
     /**
      * Add filter to field.
      *
-     * @param QueryFilter[] ...$filter
+     * @param string[] $filters
      *
      * @return QueryField
      */
-    public function addFilters(QueryFilter ...$filter): QueryField;
+    public function setFilters(array $filters): QueryField;
 
     /**
      * Get field filters.
@@ -45,7 +45,7 @@ interface QueryField
     /**
      * @return QueryType|null
      */
-    public function getType(): ?QueryType;
+    public function getType();
 
     /**
      * Set entity.

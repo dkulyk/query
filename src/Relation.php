@@ -2,8 +2,8 @@
 declare(strict_types=1);
 namespace DKulyk\Eloquent\Query;
 
-use DtKt\Query\Contracts\QueryEntity;
-use DtKt\Query\Filters;
+use DKulyk\Eloquent\Query\Contracts\QueryEntity;
+use DKulyk\Eloquent\Query\Filters;
 
 /**
  * Class Relation

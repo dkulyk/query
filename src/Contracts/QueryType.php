@@ -26,4 +26,11 @@ interface QueryType
      * @return string
      */
     public function printValue($value): string;
+
+    /**
+     * Get filter options.
+     *
+     * @return array
+     */
+    public function getFilter(): array;
 }

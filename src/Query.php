@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
+
 namespace DKulyk\Eloquent\Query;
 
-
+use RuntimeException;
 use DKulyk\Eloquent\Query\Contracts;
+use DKulyk\Eloquent\Query\Types;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -32,9 +34,11 @@ class Query
     /**
      * Query constructor.
      *
-     * @param object     $model
-     * @param array      $conditions
+     * @param mixed $model
+     * @param array $conditions
      * @param array|null $fields
+     *
+     * @throws RuntimeException
      */
     public function __construct($model, array $conditions = [], array $fields = null)
     {
@@ -44,9 +48,11 @@ class Query
     }
 
     /**
-     * @param object $object
+     * @param mixed $object
      *
      * @return Contracts\QueryEntity
+     *
+     * @throws RuntimeException
      */
     public static function getMeta($object): Contracts\QueryEntity
     {
@@ -57,64 +63,162 @@ class Query
             return $object;
         }
         $class = get_class($object);
-        throw new \RuntimeException("Object {$class} not have meta.");
-    }
 
-    /**
-     * @param Builder                $query
-     * @param Contracts\QueryField[] $fields
-     * @param array                  $condition
-     */
-    protected function buildCondition(Builder $query, array $fields, array $condition)
-    {
-        if (in_array($condition[0], ['or', 'and'], true)) {
-            if (count($condition[1]) < 2) {
-                $this->getSubQuery($this->meta, $query, $condition[1]);
-            } else {
-                $query->where(function (Builder $query) use ($condition) {
-                    $this->getSubQuery($this->meta, $query, $condition[1], $condition[0]);
-                });
-            }
-        } elseif (array_key_exists($condition[1], $fields)) {
-            $field = $fields[$condition[1]];
-            $filters = $field->getFilters();
-
-            if (!array_key_exists($condition[0], $filters)) {
-                throw new \RuntimeException("Filter {$condition[0]} not found.");
-            }
-            $filter = $filters[$condition[0]];
-            $filter->filter($query, $field->getField(), $condition[2], (bool)($condition[3] ?? false));
-        } else {
-            throw new \RuntimeException("Field {$condition[1]} not found.");
-        }
+        throw new RuntimeException("Object {$class} not have meta.");
     }
 
     /**
      * @param Contracts\QueryEntity $meta
-     * @param Builder|null          $query
-     * @param array                 $conditions
-     * @param string                $boolean
+     * @param Builder $query
+     * @param array $condition
+     * @param string $boolean
+     *
+     * @return void
+     *
+     * @throws RuntimeException
+     */
+    protected function buildCondition(
+        Contracts\QueryEntity $meta,
+        Builder $query,
+        array $condition,
+        $boolean = 'and'
+    ) {
+        $fields = $meta->getFields();
+        if (array_key_exists('data', $condition) && array_key_exists('relation', $condition['data'])) {
+            $type = $fields[$condition['data']['relation']]->getType();
+            if ($type instanceof Types\Relation) {
+                $meta = $type->getEntity();
+            } else {
+                throw new RuntimeException("Field {$condition['data']['relation']} is not instance of Types\Relation");
+            }
+            $query->whereHas($condition['data']['relation'], function (Builder $query) use ($meta, $condition) {
+                return $this->getSubQuery($meta, $query, $condition['rules'], $condition['condition']);
+            });
+        } elseif (array_key_exists('condition', $condition)) {
+            $query->where(function (Builder $query) use ($meta, $condition) {
+                return $this->getSubQuery($meta, $query, $condition['rules'], $condition['condition']);
+            });
+        } elseif (array_key_exists($condition['field'], $fields)) {
+            $this->applyFilter(
+                $query,
+                $fields[$condition['field']],
+                $condition['operator'],
+                $condition['value'] ?? null,
+                $boolean
+            );
+        } else {
+            throw new RuntimeException("Field {$condition['field']} not found.");
+        }
+    }
+
+    /**
+     * @param Builder $query
+     * @param string $filter
+     * @param Contracts\QueryField $field
+     * @param mixed $value
+     * @param string $boolean
      *
      * @return Builder
+     */
+    protected function applyFilter(
+        Builder $query,
+        Contracts\QueryField $field,
+        string $filter,
+        $value,
+        $boolean = 'and'
+    ): Builder {
+        $type = $field->getType();
+        if ($type) {
+            $value = is_array($value) ? array_map([$type, 'prepareValue'], $value) : $type->prepareValue($value);
+        }
+        switch ($filter) {
+            case 'equal':
+                $query->where($field->getField(), '=', $value, $boolean);
+                break;
+            case 'not_equal':
+                $query->where($field->getField(), '<>', $value, $boolean);
+                break;
+            case 'in':
+                $query->whereIn($field->getField(), (array)$value, $boolean);
+                break;
+            case 'not_in':
+                $query->whereNotIn($field->getField(), (array)$value, $boolean);
+                break;
+            case 'less':
+                $query->where($field->getField(), '<', $value, $boolean);
+                break;
+            case 'less_or_equal':
+                $query->where($field->getField(), '<=', $value, $boolean);
+                break;
+            case 'greater':
+                $query->where($field->getField(), '>', $value, $boolean);
+                break;
+            case 'greater_or_equal':
+                $query->where($field->getField(), '>=', $value, $boolean);
+                break;
+            case 'between':
+                $query->whereBetween($field->getField(), (array)$value, $boolean);
+                break;
+            case 'not_between':
+                $query->whereNotBetween($field->getField(), (array)$value, $boolean);
+                break;
+            case 'begins_with':
+                $query->where($field->getField(), 'like', "{$value}%", $boolean);
+                break;
+            case 'not_begins_with':
+                $query->where($field->getField(), 'not like', "{$value}%", $boolean);
+                break;
+            case 'contains':
+                $query->where($field->getField(), 'like', "%{$value}%", $boolean);
+                break;
+            case 'not_contains':
+                $query->where($field->getField(), 'not like', "%{$value}%", $boolean);
+                break;
+            case 'ends_with':
+                $query->where($field->getField(), 'like', "%{$value}", $boolean);
+                break;
+            case 'not_ends_with':
+                $query->where($field->getField(), 'not like', "%{$value}", $boolean);
+                break;
+            case 'is_empty':
+                $query->where($field->getField(), '=', '', $boolean);
+                break;
+            case 'is_not_empty':
+                $query->where($field->getField(), '<>', '', $boolean);
+                break;
+            case 'is_null':
+                $query->whereNull($field->getField(), $boolean);
+                break;
+            case 'is_not_null':
+                $query->whereNotNull($field->getField(), $boolean);
+                break;
+        }
+
+        //dd($query->toSql(), $query->getBindings());
+        return $query;
+    }
+
+    /**
+     * @param Contracts\QueryEntity $meta
+     * @param Builder|null $query
+     * @param array $conditions
+     * @param string $boolean
+     *
+     * @return Builder
+     *
+     * @throws RuntimeException
      */
     protected function getSubQuery(
         Contracts\QueryEntity $meta,
         Builder $query = null,
         array $conditions = [],
-        $boolean = null
+        $boolean = 'and'
     ): Builder {
-        $fields = $meta->getFields();
         $model = $meta->getModel();
         $query = $query ?? $model->newQuery();
 
         foreach ($conditions as $condition) {
-            if ($boolean === null) {
-                $this->buildCondition($query, $fields, $condition);
-            } else {
-                $query->where(function (Builder $query) use ($condition, $fields) {
-                    $this->buildCondition($query, $fields, $condition);
-                }, null, null, $boolean);
-            }
+            $this->buildCondition($meta, $query, $condition, $boolean);
         }
         return $query;
     }
@@ -123,10 +227,12 @@ class Query
      * @param Builder|null $query
      *
      * @return Builder
+     *
+     * @throws RuntimeException
      */
     public function buildQuery(Builder $query = null): Builder
     {
-        $query = $this->getSubQuery($this->meta, $query, $this->conditions);
+        $query = $this->getSubQuery($this->meta, $query, $this->conditions['rules'], $this->conditions['condition']);
 
         if ($this->offset > 0) {
             $query->offset($this->offset);

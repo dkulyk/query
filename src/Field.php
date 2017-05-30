@@ -1,11 +1,12 @@
 <?php
 declare(strict_types = 1);
+
 namespace DKulyk\Eloquent\Query;
 
-use DtKt\Query\Contracts\QueryEntity;
-use DtKt\Query\Contracts\QueryField;
-use DtKt\Query\Contracts\QueryFilter;
-use DtKt\Query\Contracts\QueryType;
+use DKulyk\Eloquent\Query\Contracts\QueryEntity;
+use DKulyk\Eloquent\Query\Contracts\QueryField;
+use DKulyk\Eloquent\Query\Contracts\QueryFilter;
+use DKulyk\Eloquent\Query\Contracts\QueryType;
 
 /**
  * Class Field
@@ -39,15 +40,17 @@ class Field implements QueryField
     /**
      * Field constructor.
      *
-     * @param string              $field
-     * @param string              $label
+     * @param string $field
+     * @param string $label
      * @param QueryType|null $type
+     * @param array $filters
      */
-    public function __construct(string $field, string $label, QueryType $type = null)
+    public function __construct(string $field, string $label, QueryType $type = null, array $filters = [])
     {
         $this->field = $field;
         $this->label = $label;
         $this->type = $type;
+        $this->setFilters($filters);
     }
 
     /**
@@ -69,7 +72,7 @@ class Field implements QueryField
     /**
      * @inheritdoc
      */
-    public function getType(): ?QueryType
+    public function getType()
     {
         return $this->type;
     }
@@ -86,11 +89,9 @@ class Field implements QueryField
     /**
      * @inheritdoc
      */
-    public function addFilters(QueryFilter ...$filters): QueryField
+    public function setFilters(array $filters): QueryField
     {
-        foreach ($filters as $filter) {
-            $this->filters[$filter->getName()] = $filter;
-        }
+        $this->filters = $filters;
 
         return $this;
     }

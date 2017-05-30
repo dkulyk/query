@@ -8,7 +8,8 @@
   ],
   "require": {
     "php": ">=5.4.0",
-    "laravel/framework": "^5.0"
+    "laravel/framework": "^5.0",
+    "psr/container": "^1.0"
   },
   "license": "MIT",
   "authors": [
@@ -20,6 +21,12 @@
   "autoload": {
     "psr-4": {
       "DKulyk\\Eloquent\\Query\\": "src/"
+    }
+  },
+  "extra": {
+    "module": {
+      "name": "eloquent-queries",
+      "providers": "DKulyk\\Eloquent\\Query\\ModuleProvider"
     }
   }
 }

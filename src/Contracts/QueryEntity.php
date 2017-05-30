@@ -3,6 +3,7 @@ declare(strict_types = 1);
 namespace DKulyk\Eloquent\Query\Contracts;
 
 use Illuminate\Database\Eloquent\Model;
+use RuntimeException;
 
 /**
  * Interface QueryEntity
@@ -17,6 +18,15 @@ interface QueryEntity
     public function getFields(): array;
 
     /**
+     * @param string $field
+     *
+     * @return QueryField
+     *
+     * @throws RuntimeException
+     */
+    public function getField(string $field): QueryField;
+
+    /**
      * @param QueryField[] ...$fields
      *
      * @return QueryEntity
@@ -29,4 +39,16 @@ interface QueryEntity
      * @return Model
      */
     public function getModel(): Model;
+
+    /**
+     * @param string $name
+     *
+     * @return QueryEntity
+     */
+    public function setName(string $name): QueryEntity;
+
+    /**
+     * @return string
+     */
+    public function getName(): string;
 }

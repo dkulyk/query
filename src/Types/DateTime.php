@@ -1,36 +1,28 @@
 <?php
 declare(strict_types=1);
+
 namespace DKulyk\Eloquent\Query\Types;
 
-use DKulyk\Eloquent\Query\Contracts\QueryType;
+use Carbon\Carbon;
 
 /**
- * Class Date
+ * Class DateTime
  *
  * @package DtKt\Query\Types
  */
-class DateTime implements QueryType
+class DateTime extends Date
 {
+    protected $type = 'datetime';
     /**
-     * @var string
-     */
-    protected $format;
-
-    /**
-     * @var string
-     */
-    protected $printFormat;
-
-    /**
-     * Date constructor.
+     * DateTime constructor.
      *
      * @param string $format
      * @param string $printFormat
+     * @param array $options
      */
-    public function __construct($format = 'Y-m-d', $printFormat = 'm/d/Y')
+    public function __construct($format = 'd.m.Y H:i', $printFormat = 'dd.mm.yyyy hh:ii', array $options = [])
     {
-        $this->format = $format;
-        $this->printFormat = $printFormat;
+        parent::__construct($format, $printFormat, $options);
     }
 
     /**
@@ -38,14 +30,6 @@ class DateTime implements QueryType
      */
     public function prepareValue($value)
     {
-        return (new \DateTime($value))->format($this->format);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function printValue($value): string
-    {
-        return (new \DateTime($value))->format($this->printFormat);
+        return Carbon::createFromFormat($this->format, $value)->toDateTimeString();
     }
 }
