@@ -91,13 +91,16 @@ class Query
             } else {
                 throw new RuntimeException("Field {$condition['data']['relation']} is not instance of Types\Relation");
             }
-            $query->whereHas($condition['data']['relation'], function (Builder $query) use ($meta, $condition) {
-                return $this->getSubQuery($meta, $query, $condition['rules'], $condition['condition']);
+            $method = $boolean === 'or' ? 'orWhereHas' : 'whereHas';
+            $query->{$method}($condition['data']['relation'], function (Builder $query) use ($meta, $condition) {
+                $query->where(function (Builder $query) use ($meta, $condition) {
+                    $this->getSubQuery($meta, $query, $condition['rules'], $condition['condition']);
+                });
             });
         } elseif (array_key_exists('condition', $condition)) {
             $query->where(function (Builder $query) use ($meta, $condition) {
-                return $this->getSubQuery($meta, $query, $condition['rules'], $condition['condition']);
-            });
+                $this->getSubQuery($meta, $query, $condition['rules'], $condition['condition']);
+            }, null, null, $boolean);
         } elseif (array_key_exists($condition['field'], $fields)) {
             $this->applyFilter(
                 $query,
