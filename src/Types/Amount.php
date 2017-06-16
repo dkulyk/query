@@ -28,15 +28,15 @@ class Amount extends AbstractType
     /**
      * Amount constructor.
      *
-     * @param int $precision
-     * @param int $multiplier
+     * @param int   $precision
+     * @param int   $multiplier
      * @param array $options
      */
     public function __construct($precision = 2, $multiplier = 1, array $options = [])
     {
         $this->precision = $precision;
         $this->multiplier = $multiplier;
-        $this->options = array_merge($options, ['decimals' => $precision]);
+        $this->options = array_merge(['thousands' => ',', 'decimal' => '.'], $options, ['decimals' => $precision]);
     }
 
     /**
@@ -44,7 +44,8 @@ class Amount extends AbstractType
      */
     public function prepareValue($value)
     {
-        return $value * $this->multiplier;
+        return str_replace([$this->options['thousands'], $this->options['decimal']], ['', '.'], $value)
+            * $this->multiplier;
     }
 
     /**
