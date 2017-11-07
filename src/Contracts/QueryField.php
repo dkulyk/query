@@ -17,6 +17,11 @@ interface QueryField
     /**
      * @return string
      */
+    public function getQualifiedField():string;
+
+    /**
+     * @return string
+     */
     public function getLabel(): string;
 
     /**

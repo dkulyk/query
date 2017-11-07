@@ -1,11 +1,10 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace DKulyk\Eloquent\Query;
 
 use DKulyk\Eloquent\Query\Contracts\QueryEntity;
 use DKulyk\Eloquent\Query\Contracts\QueryField;
-use DKulyk\Eloquent\Query\Contracts\QueryFilter;
 use DKulyk\Eloquent\Query\Contracts\QueryType;
 
 /**
@@ -40,10 +39,10 @@ class Field implements QueryField
     /**
      * Field constructor.
      *
-     * @param string $field
-     * @param string $label
+     * @param string         $field
+     * @param string         $label
      * @param QueryType|null $type
-     * @param array $filters
+     * @param array          $filters
      */
     public function __construct(string $field, string $label, QueryType $type = null, array $filters = [])
     {
@@ -59,6 +58,14 @@ class Field implements QueryField
     public function getField(): string
     {
         return $this->field;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getQualifiedField(): string
+    {
+        return $this->entity->getModel()->getTable() . '.' . $this->getField();
     }
 
     /**

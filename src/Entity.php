@@ -34,7 +34,8 @@ abstract class Entity implements QueryEntity
     /**
      * Client constructor.
      *
-     * @param Model|null $model
+     * @param Model|null  $model
+     * @param string|null $name
      */
     public function __construct(Model $model, string $name = null)
     {

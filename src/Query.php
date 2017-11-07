@@ -134,66 +134,67 @@ class Query
         if ($type) {
             $value = is_array($value) ? array_map([$type, 'prepareValue'], $value) : $type->prepareValue($value);
         }
+        $qualifiedField = $field->getQualifiedField();
         switch ($filter) {
             case 'equal':
-                $query->where($field->getField(), '=', $value, $boolean);
+                $query->where($qualifiedField, '=', $value, $boolean);
                 break;
             case 'not_equal':
-                $query->where($field->getField(), '<>', $value, $boolean);
+                $query->where($qualifiedField, '<>', $value, $boolean);
                 break;
             case 'in':
-                $query->whereIn($field->getField(), (array)$value, $boolean);
+                $query->whereIn($qualifiedField, (array)$value, $boolean);
                 break;
             case 'not_in':
-                $query->whereNotIn($field->getField(), (array)$value, $boolean);
+                $query->whereNotIn($qualifiedField, (array)$value, $boolean);
                 break;
             case 'less':
-                $query->where($field->getField(), '<', $value, $boolean);
+                $query->where($qualifiedField, '<', $value, $boolean);
                 break;
             case 'less_or_equal':
-                $query->where($field->getField(), '<=', $value, $boolean);
+                $query->where($qualifiedField, '<=', $value, $boolean);
                 break;
             case 'greater':
-                $query->where($field->getField(), '>', $value, $boolean);
+                $query->where($qualifiedField, '>', $value, $boolean);
                 break;
             case 'greater_or_equal':
-                $query->where($field->getField(), '>=', $value, $boolean);
+                $query->where($qualifiedField, '>=', $value, $boolean);
                 break;
             case 'between':
-                $query->whereBetween($field->getField(), (array)$value, $boolean);
+                $query->whereBetween($qualifiedField, (array)$value, $boolean);
                 break;
             case 'not_between':
-                $query->whereNotBetween($field->getField(), (array)$value, $boolean);
+                $query->whereNotBetween($qualifiedField, (array)$value, $boolean);
                 break;
             case 'begins_with':
-                $query->where($field->getField(), 'like', "{$value}%", $boolean);
+                $query->where($qualifiedField, 'like', "{$value}%", $boolean);
                 break;
             case 'not_begins_with':
-                $query->where($field->getField(), 'not like', "{$value}%", $boolean);
+                $query->where($qualifiedField, 'not like', "{$value}%", $boolean);
                 break;
             case 'contains':
-                $query->where($field->getField(), 'like', "%{$value}%", $boolean);
+                $query->where($qualifiedField, 'like', "%{$value}%", $boolean);
                 break;
             case 'not_contains':
-                $query->where($field->getField(), 'not like', "%{$value}%", $boolean);
+                $query->where($qualifiedField, 'not like', "%{$value}%", $boolean);
                 break;
             case 'ends_with':
-                $query->where($field->getField(), 'like', "%{$value}", $boolean);
+                $query->where($qualifiedField, 'like', "%{$value}", $boolean);
                 break;
             case 'not_ends_with':
-                $query->where($field->getField(), 'not like', "%{$value}", $boolean);
+                $query->where($qualifiedField, 'not like', "%{$value}", $boolean);
                 break;
             case 'is_empty':
-                $query->where($field->getField(), '=', '', $boolean);
+                $query->where($qualifiedField, '=', '', $boolean);
                 break;
             case 'is_not_empty':
-                $query->where($field->getField(), '<>', '', $boolean);
+                $query->where($qualifiedField, '<>', '', $boolean);
                 break;
             case 'is_null':
-                $query->whereNull($field->getField(), $boolean);
+                $query->whereNull($qualifiedField, $boolean);
                 break;
             case 'is_not_null':
-                $query->whereNotNull($field->getField(), $boolean);
+                $query->whereNotNull($qualifiedField, $boolean);
                 break;
         }
 
