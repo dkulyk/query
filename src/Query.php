@@ -82,7 +82,8 @@ class Query
         Builder $query,
         array $condition,
         $boolean = 'and'
-    ) {
+    )
+    {
         $fields = $meta->getFields();
         if (array_key_exists('data', $condition) && array_key_exists('relation', $condition['data'])) {
             $type = $fields[$condition['data']['relation']]->getType();
@@ -96,7 +97,7 @@ class Query
                 $query->where(function (Builder $query) use ($meta, $condition) {
                     $this->getSubQuery($meta, $query, $condition['rules'], $condition['condition']);
                 });
-            }, ($condition['not'] ?? false ? '<' : '>='));
+            }, ($condition['not'] ?? false ? '<' : '>='), $condition['count'] ?? 1);
         } elseif (array_key_exists('condition', $condition)) {
             $query->where(function (Builder $query) use ($meta, $condition) {
                 $this->getSubQuery($meta, $query, $condition['rules'], $condition['condition']);
@@ -129,7 +130,8 @@ class Query
         string $filter,
         $value,
         $boolean = 'and'
-    ): Builder {
+    ): Builder
+    {
         $type = $field->getType();
         if ($type) {
             $value = is_array($value) ? array_map([$type, 'prepareValue'], $value) : $type->prepareValue($value);
@@ -217,7 +219,8 @@ class Query
         Builder $query = null,
         array $conditions = [],
         $boolean = 'and'
-    ): Builder {
+    ): Builder
+    {
         $model = $meta->getModel();
         $query = $query ?? $model->newQuery();
 
