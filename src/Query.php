@@ -97,7 +97,7 @@ class Query
                 $query->where(function (Builder $query) use ($meta, $condition) {
                     $this->getSubQuery($meta, $query, $condition['rules'], $condition['condition']);
                 });
-            }, ($condition['not'] ?? false ? '<' : '>='), $condition['count'] ?? 1);
+            }, ($condition['not'] ?? false ? '<' : '>='), $condition['data']['count'] ?? 1);
         } elseif (array_key_exists('condition', $condition)) {
             $query->where(function (Builder $query) use ($meta, $condition) {
                 $this->getSubQuery($meta, $query, $condition['rules'], $condition['condition']);
