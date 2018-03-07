@@ -133,7 +133,7 @@ class Query
     ): Builder
     {
         $type = $field->getType();
-        if ($type) {
+        if ($type && $value !== null) {
             $value = is_array($value) ? array_map([$type, 'prepareValue'], $value) : $type->prepareValue($value);
         }
         $qualifiedField = $field->getQualifiedField();
