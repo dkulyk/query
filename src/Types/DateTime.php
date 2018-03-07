@@ -13,6 +13,7 @@ use Carbon\Carbon;
 class DateTime extends Date
 {
     protected $type = 'datetime';
+
     /**
      * DateTime constructor.
      *
@@ -30,6 +31,6 @@ class DateTime extends Date
      */
     public function prepareValue($value)
     {
-        return Carbon::createFromFormat($this->format, $value)->toDateTimeString();
+        return $value === null ? null : Carbon::createFromFormat($this->format, $value)->toDateTimeString();
     }
 }

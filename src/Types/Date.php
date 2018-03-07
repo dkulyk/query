@@ -53,7 +53,7 @@ class Date extends AbstractType
      */
     public function prepareValue($value)
     {
-        return Carbon::createFromFormat($this->format, $value)->toDateString();
+        return $value === null ? null : Carbon::createFromFormat($this->format, $value)->toDateString();
     }
 
     /**
