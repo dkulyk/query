@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
+
 namespace DKulyk\Eloquent\Query;
 
-use DKulyk\Eloquent\Query\Contracts\QueryEntity;
-use DKulyk\Eloquent\Query\Filters;
+use DKulyk\Eloquent\Query\Contracts\QueryType;
+use DKulyk\Eloquent\Query\Types\Relation as RelationType;
 
 /**
  * Class Relation
@@ -13,22 +14,10 @@ use DKulyk\Eloquent\Query\Filters;
 class Relation extends Field
 {
     /**
-     * Relation constructor.
-     *
-     * @param string $field
-     * @param string $label
+     * @return QueryType|null
      */
-    public function __construct($field, $label)
+    public function getType(): ?QueryType
     {
-        parent::__construct($field, $label);
-        $this->addFilters(new Filters\Relation());
-    }
-
-    /**
-     * @return QueryEntity
-     */
-    public function getRelatedEntity(): QueryEntity
-    {
-        return Query::getMeta($this->entity->getModel()->{$this->field}()->getRelated());
+        return $this->type ?: new RelationType($this->entity->getModel()->{$this->field}()->getModel());
     }
 }

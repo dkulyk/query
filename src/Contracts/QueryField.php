@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
+
 namespace DKulyk\Eloquent\Query\Contracts;
 
 /**
@@ -17,7 +18,7 @@ interface QueryField
     /**
      * @return string
      */
-    public function getQualifiedField():string;
+    public function getQualifiedField(): string;
 
     /**
      * @return string
@@ -50,10 +51,11 @@ interface QueryField
     /**
      * @return QueryType|null
      */
-    public function getType();
+    public function getType(): ?QueryType;
 
     /**
      * Set entity.
+     *
      * @param QueryEntity $entity
      */
     public function setEntity(QueryEntity $entity);

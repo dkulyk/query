@@ -79,7 +79,7 @@ class Field implements QueryField
     /**
      * @inheritdoc
      */
-    public function getType()
+    public function getType(): ?QueryType
     {
         return $this->type;
     }
