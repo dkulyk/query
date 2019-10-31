@@ -225,7 +225,7 @@ class Query
         $query = $query ?? $model->newQuery();
 
         foreach ($conditions as $condition) {
-            $this->buildCondition($meta, $query, $condition, $boolean);
+            $this->buildCondition($meta, $query, $condition, strtolower($boolean));
         }
         return $query;
     }
