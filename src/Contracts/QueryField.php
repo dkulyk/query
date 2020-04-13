@@ -59,4 +59,11 @@ interface QueryField
      * @param QueryEntity $entity
      */
     public function setEntity(QueryEntity $entity);
+
+    /**
+     * Get scopes what must be excluded
+     *
+     * @return array
+     */
+    public function getWithoutScopes(): array;
 }

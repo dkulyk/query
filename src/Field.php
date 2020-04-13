@@ -37,12 +37,17 @@ class Field implements QueryField
     protected $entity;
 
     /**
+     * @var array
+     */
+    protected $withoutScopes = [];
+
+    /**
      * Field constructor.
      *
-     * @param string         $field
-     * @param string         $label
-     * @param QueryType|null $type
-     * @param array          $filters
+     * @param  string  $field
+     * @param  string  $label
+     * @param  QueryType|null  $type
+     * @param  array  $filters
      */
     public function __construct(string $field, string $label, QueryType $type = null, array $filters = [])
     {
@@ -117,5 +122,24 @@ class Field implements QueryField
     public function setEntity(QueryEntity $entity)
     {
         $this->entity = $entity;
+    }
+
+    /**
+     * @return array
+     */
+    public function getWithoutScopes(): array
+    {
+        return $this->withoutScopes;
+    }
+
+    /**
+     * @param  array  $withoutScopes
+     * @return Field
+     */
+    public function withoutScopes(array $withoutScopes = []): Field
+    {
+        $this->withoutScopes = $withoutScopes;
+
+        return $this;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace DKulyk\Eloquent\Query;
@@ -34,9 +35,9 @@ class Query
     /**
      * Query constructor.
      *
-     * @param mixed $model
-     * @param array $conditions
-     * @param array|null $fields
+     * @param  mixed  $model
+     * @param  array  $conditions
+     * @param  array|null  $fields
      *
      * @throws RuntimeException
      */
@@ -48,7 +49,7 @@ class Query
     }
 
     /**
-     * @param mixed $object
+     * @param  mixed  $object
      *
      * @return Contracts\QueryEntity
      *
@@ -68,10 +69,10 @@ class Query
     }
 
     /**
-     * @param Contracts\QueryEntity $meta
-     * @param Builder $query
-     * @param array $condition
-     * @param string $boolean
+     * @param  Contracts\QueryEntity  $meta
+     * @param  Builder  $query
+     * @param  array  $condition
+     * @param  string  $boolean
      *
      * @return void
      *
@@ -82,9 +83,14 @@ class Query
         Builder $query,
         array $condition,
         $boolean = 'and'
-    )
-    {
+    ) {
         $fields = $meta->getFields();
+        $field = $fields[$condition['field'] ?? null] ?? null;
+
+        if ($field instanceof Field) {
+            $query->withoutGlobalScopes($field->getWithoutScopes());
+        }
+
         if (array_key_exists('data', $condition) && array_key_exists('relation', $condition['data'])) {
             $type = $fields[$condition['data']['relation']]->getType();
             if ($type instanceof Types\Relation) {
@@ -102,10 +108,10 @@ class Query
             $query->where(function (Builder $query) use ($meta, $condition) {
                 $this->getSubQuery($meta, $query, $condition['rules'], $condition['condition']);
             }, null, null, $boolean);
-        } elseif (array_key_exists($condition['field'], $fields)) {
+        } elseif ($field instanceof Contracts\QueryField) {
             $this->applyFilter(
                 $query,
-                $fields[$condition['field']],
+                $field,
                 $condition['operator'],
                 $condition['value'] ?? null,
                 $boolean
@@ -116,11 +122,11 @@ class Query
     }
 
     /**
-     * @param Builder $query
-     * @param string $filter
-     * @param Contracts\QueryField $field
-     * @param mixed $value
-     * @param string $boolean
+     * @param  Builder  $query
+     * @param  string  $filter
+     * @param  Contracts\QueryField  $field
+     * @param  mixed  $value
+     * @param  string  $boolean
      *
      * @return Builder
      */
@@ -130,8 +136,7 @@ class Query
         string $filter,
         $value,
         $boolean = 'and'
-    ): Builder
-    {
+    ): Builder {
         $type = $field->getType();
         if ($type && $value !== null) {
             $value = is_array($value) ? array_map([$type, 'prepareValue'], $value) : $type->prepareValue($value);
@@ -145,10 +150,10 @@ class Query
                 $query->where($qualifiedField, '<>', $value, $boolean);
                 break;
             case 'in':
-                $query->whereIn($qualifiedField, (array)$value, $boolean);
+                $query->whereIn($qualifiedField, (array) $value, $boolean);
                 break;
             case 'not_in':
-                $query->whereNotIn($qualifiedField, (array)$value, $boolean);
+                $query->whereNotIn($qualifiedField, (array) $value, $boolean);
                 break;
             case 'less':
                 $query->where($qualifiedField, '<', $value, $boolean);
@@ -163,10 +168,10 @@ class Query
                 $query->where($qualifiedField, '>=', $value, $boolean);
                 break;
             case 'between':
-                $query->whereBetween($qualifiedField, (array)$value, $boolean);
+                $query->whereBetween($qualifiedField, (array) $value, $boolean);
                 break;
             case 'not_between':
-                $query->whereNotBetween($qualifiedField, (array)$value, $boolean);
+                $query->whereNotBetween($qualifiedField, (array) $value, $boolean);
                 break;
             case 'begins_with':
                 $query->where($qualifiedField, 'like', "{$value}%", $boolean);
@@ -205,10 +210,10 @@ class Query
     }
 
     /**
-     * @param Contracts\QueryEntity $meta
-     * @param Builder|null $query
-     * @param array $conditions
-     * @param string $boolean
+     * @param  Contracts\QueryEntity  $meta
+     * @param  Builder|null  $query
+     * @param  array  $conditions
+     * @param  string  $boolean
      *
      * @return Builder
      *
@@ -219,19 +224,19 @@ class Query
         Builder $query = null,
         array $conditions = [],
         $boolean = 'and'
-    ): Builder
-    {
+    ): Builder {
         $model = $meta->getModel();
         $query = $query ?? $model->newQuery();
 
         foreach ($conditions as $condition) {
             $this->buildCondition($meta, $query, $condition, strtolower($boolean));
         }
+
         return $query;
     }
 
     /**
-     * @param Builder|null $query
+     * @param  Builder|null  $query
      *
      * @return Builder
      *
