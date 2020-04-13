@@ -70,7 +70,7 @@ class Field implements QueryField
      */
     public function getQualifiedField(): string
     {
-        return $this->entity->getModel()->getTable() . '.' . $this->getField();
+        return $this->entity->getModel()->qualifyColumn($this->getField());
     }
 
     /**

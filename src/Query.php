@@ -87,7 +87,7 @@ class Query
         $fields = $meta->getFields();
         $field = $fields[$condition['field'] ?? null] ?? null;
 
-        if ($field instanceof Field) {
+        if ($field instanceof Contracts\QueryField) {
             $query->withoutGlobalScopes($field->getWithoutScopes());
         }
 
@@ -100,13 +100,15 @@ class Query
             }
             $method = $boolean === 'or' ? 'orWhereHas' : 'whereHas';
             $query->{$method}($condition['data']['relation'], function (Builder $query) use ($meta, $condition) {
-                $query->where(function (Builder $query) use ($meta, $condition) {
-                    $this->getSubQuery($meta, $query, $condition['rules'], $condition['condition']);
+                $query->where(function (Builder $builder) use ($meta, $condition, $query) {
+                    $this->getSubQuery($meta, $builder, $condition['rules'], $condition['condition']);
+                    $query->withoutGlobalScopes($builder->removedScopes());
                 });
             }, ($condition['not'] ?? false ? '<' : '>='), $condition['data']['count'] ?? 1);
         } elseif (array_key_exists('condition', $condition)) {
-            $query->where(function (Builder $query) use ($meta, $condition) {
-                $this->getSubQuery($meta, $query, $condition['rules'], $condition['condition']);
+            $query->where(function (Builder $builder) use ($query, $meta, $condition) {
+                $this->getSubQuery($meta, $builder, $condition['rules'], $condition['condition']);
+                $query->withoutGlobalScopes($builder->removedScopes());
             }, null, null, $boolean);
         } elseif ($field instanceof Contracts\QueryField) {
             $this->applyFilter(
