@@ -143,7 +143,15 @@ class Query
         if ($type && $value !== null) {
             $value = is_array($value) ? array_map([$type, 'prepareValue'], $value) : $type->prepareValue($value);
         }
+
+        if (method_exists($type, 'applyFilter')) {
+            if ($type->applyFilter($query, $field, $filter, $value, $boolean) !== false) {
+                return $query;
+            }
+        }
+
         $qualifiedField = $field->getQualifiedField();
+
         switch ($filter) {
             case 'equal':
                 $query->where($qualifiedField, '=', $value, $boolean);
