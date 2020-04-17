@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace DKulyk\Eloquent\Query\Types;
 
 use Carbon\Carbon;
+use DKulyk\Eloquent\Query\Contracts\QueryField;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Class DateTime
@@ -32,5 +34,15 @@ class DateTime extends Date
     public function prepareValue($value)
     {
         return $value === null ? null : Carbon::createFromFormat($this->format, $value)->toDateTimeString();
+    }
+
+    public function applyFilter(
+        Builder $query,
+        QueryField $field,
+        string $filter,
+        $value,
+        $boolean = 'and'
+    ): bool{
+        return false;
     }
 }

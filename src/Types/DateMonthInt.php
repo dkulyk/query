@@ -3,6 +3,8 @@ declare(strict_types=1);
 namespace DKulyk\Eloquent\Query\Types;
 
 use Carbon\Carbon;
+use DKulyk\Eloquent\Query\Contracts\QueryField;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Class DateMonthInt
@@ -32,5 +34,15 @@ class DateMonthInt extends Date
         $date = Carbon::createFromFormat($this->format, $value);
 
         return $date->year * 12 + ($date->month - 1);
+    }
+
+    public function applyFilter(
+        Builder $query,
+        QueryField $field,
+        string $filter,
+        $value,
+        $boolean = 'and'
+    ): bool{
+        return false;
     }
 }
