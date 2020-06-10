@@ -37,6 +37,7 @@ class Manager implements QueryManager
             if ($this->has($name)) {
                 throw new RuntimeException("Meta with name \"{$name}\" already exists.");
             }
+            $this->meta[get_class($entity->getModel())] = $entity;
             $this->meta[$name] = $entity;
         } else {
             throw new InvalidArgumentException('Argument must be instanceof QueryEntityAware or QueryEntity.');
