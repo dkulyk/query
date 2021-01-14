@@ -144,7 +144,7 @@ class Query
             $value = is_array($value) ? array_map([$type, 'prepareValue'], $value) : $type->prepareValue($value);
         }
 
-        if (method_exists($type, 'applyFilter')) {
+        if ($type && method_exists($type, 'applyFilter')) {
             if ($type->applyFilter($query, $field, $filter, $value, $boolean) !== false) {
                 return $query;
             }
