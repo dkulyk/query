@@ -41,7 +41,15 @@ class Enum extends AbstractType
         return [
             'input' => 'select',
             'multiple' => true,
-            'values' => (object) $this->values
+            'values' => (object) array_map(fn($value) => is_array($value) ? $value['caption'] ?? $value : $value, $this->values),
         ];
+    }
+
+    public function prepareValue($value)
+    {
+        if(is_array($this->values[$value] ?? null)) {
+            return $this->values[$value]['value'] ?? $value;
+        }
+        return $value;
     }
 }
